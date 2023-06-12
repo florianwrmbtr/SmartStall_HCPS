@@ -11,23 +11,40 @@ namespace Test2.Controllers
 {
     public class HomeController : Controller
     {
-        Ammoniak am = new Ammoniak();
+        Ammoniak amonniak = new Ammoniak();
+        Luftfeuchtigkeit luftfeuchtigkeit = new Luftfeuchtigkeit();
+
         public ActionResult Index()
         {
-            ViewBag.ammoniakWerteTagAktuell = am.AmmoniakAktuellListeTag;
-            ViewBag.ammoniakWerteTagDurchschnitt = am.AmmoniakDurschnittListeTag;
+            ViewBag.ammoniakWerteTagAktuell = amonniak.AmmoniakAktuellListeTag;
+            ViewBag.ammoniakWerteTagDurchschnitt = amonniak.AmmoniakDurschnittListeTag;
+
+            ViewBag.luftfeuchtigkeitWerteTagAktuell = luftfeuchtigkeit.LuftfeuchtigkeitAktuellListeTag;
+            ViewBag.luftfeuchtigkeitWerteTagDurchschnitt = luftfeuchtigkeit.LuftfeuchtigkeitDurschnittListeTag;
+
             return View();
         }
 
         public ActionResult GetAmmoniak()
         {
             Dictionary<string, string> ammoniakWerte = new Dictionary<string, string>();
-            ammoniakWerte.Add("ammoniakWerteTagAktuell", am.AmmoniakAktuellListeTag);
-            ammoniakWerte.Add("ammoniakWerteTagDurchschnitt", am.AmmoniakDurschnittListeTag);
+            ammoniakWerte.Add("ammoniakWerteTagAktuell", amonniak.AmmoniakAktuellListeTag);
+            ammoniakWerte.Add("ammoniakWerteTagDurchschnitt", amonniak.AmmoniakDurschnittListeTag);
 
-            ammoniakWerte.Add("ammoiakWerteWocheAktuell", am.AmmoniakAktuellWoche);
-            ammoniakWerte.Add("ammoniakWerteWocheDurchschnitt", am.AmmoniakDurchschnittWoche);
+            ammoniakWerte.Add("ammoiakWerteWocheAktuell", amonniak.AmmoniakAktuellWoche);
+            ammoniakWerte.Add("ammoniakWerteWocheDurchschnitt", amonniak.AmmoniakDurchschnittWoche);
             return Json(ammoniakWerte, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult GetLuftfeuchtigkeit()
+        {
+            Dictionary<string, string> luftfeuchtigkeitWerte = new Dictionary<string, string>();
+            luftfeuchtigkeitWerte.Add("luftfeuchtigkeitWerteTagAktuell", luftfeuchtigkeit.LuftfeuchtigkeitAktuellListeTag);
+            luftfeuchtigkeitWerte.Add("luftfeuchtigkeitWerteTagDurchschnitt", luftfeuchtigkeit.LuftfeuchtigkeitDurschnittListeTag);
+
+            luftfeuchtigkeitWerte.Add("luftfeuchtigkeitWerteWocheAktuell", luftfeuchtigkeit.LuftfeuchtigkeitAktuellWoche);
+            luftfeuchtigkeitWerte.Add("luftfeuchtigkeitWerteWocheDurchschnitt", luftfeuchtigkeit.LuftfeuchtigkeitDurchschnittWoche);
+            return Json(luftfeuchtigkeitWerte, JsonRequestBehavior.AllowGet);
         }
     }
 }

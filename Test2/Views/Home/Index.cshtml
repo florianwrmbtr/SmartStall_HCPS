@@ -22,6 +22,19 @@
     </div>
     <canvas id="lineChartAmmoniak"></canvas>
 </div>
+
+<!----------------------------------------Luftfeuchtigkeit----------------------------------------------->
+<br />
+<br />
+<div>
+    <h2>Luftfeuchtigkeit</h2>
+    <div class="btn-group" role="group" aria-label="Chart View">
+        <button id="wocheBtnLuftfeuchtigkeit" type="button" class="btn btn-secondary">Woche</button>
+        <button id="tagBtnLuftfeuchtigkeit" type="button" class="btn btn-secondary active">Tag</button>
+    </div>
+    <canvas id="lineChartLuftfeuchtigkeit"></canvas>
+</div>
+
 <!---------------------------------------------------------------------------------------------->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
@@ -32,6 +45,8 @@
 <script>
         var lineChartAmmoniak;
         var dataAmmoniak;
+        var lineChartLuftfeuchtigkeit;
+        var dataLuftfeuchtigkeit;
         var labelWoche = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"];
         var labelTag = ["00-01 Uhr", "02-03 Uhr", "04-05 Uhr", "06-07 Uhr", "08-09 Uhr", "10-11 Uhr", "12-13 Uhr", "14-15 Uhr", "16-17 Uhr", "18-19 Uhr", "20-21 Uhr", "22-23 Uhr"];
 
@@ -57,8 +72,29 @@
                     console.log("Fehler beim Abrufen der Ammoniakdaten:", error);
                 }
             });
+        });
 
-            lineChartAmmoniak.update();
+        document.getElementById("tagBtnLuftfeuchtigkeit").addEventListener("click", function () {
+            var dataLabels = labelTag;
+            dataLuftfeuchtigkeit.labels = dataLabels;
+
+            $.ajax({
+                url: "/Home/GetLuftfeuchtigkeit", // Die URL des Controller-Endpunkts, um die aktualisierten Daten abzurufen
+                type: "GET",
+                success: function (luftfeuchtigkeitData) {
+
+                    lineChartLuftfeuchtigkeit.data.datasets[0].data = JSON.parse(luftfeuchtigkeitData["luftfeuchtigkeitWerteTagDurchschnitt"]); //Durchschnitt
+                    lineChartLuftfeuchtigkeit.data.datasets[1].data = JSON.parse(luftfeuchtigkeitData["luftfeuchtigkeitWerteTagAktuell"]); //Aktuell
+
+                    // Diagramm neu zeichnen
+                    lineChartLuftfeuchtigkeit.update();
+                },
+                error: function (xhr, status, error) {
+                    console.log("Fehler beim Abrufen der Luftfeuchtigkeitdaten:", error);
+                }
+            });
+
+            lineChartLuftfeuchtigkeit.update();
         });
 
         document.getElementById("wocheBtnAmmoniak").addEventListener("click", function () {
@@ -80,13 +116,35 @@
                     console.log("Fehler beim Abrufen der Ammoniakdaten:", error);
                 }
             });
+        });
 
-            lineChartAmmoniak.update();
+        document.getElementById("wocheBtnLuftfeuchtigkeit").addEventListener("click", function () {
+            var dataLabels = labelWoche;
+            dataLuftfeuchtigkeit.labels = dataLabels;
+
+            $.ajax({
+                url: "/Home/GetLuftfeuchtigkeit", // Die URL des Controller-Endpunkts, um die aktualisierten Daten abzurufen
+                type: "GET",
+                success: function (luftfeuchtigkeitData) {
+
+                    lineChartLuftfeuchtigkeit.data.datasets[0].data = JSON.parse(luftfeuchtigkeitData["luftfeuchtigkeitWerteWocheDurchschnitt"]); //Durchschnitt
+                    lineChartLuftfeuchtigkeit.data.datasets[1].data = JSON.parse(luftfeuchtigkeitData["luftfeuchtigkeitWerteWocheAktuell"]); //Aktuell
+
+                    // Diagramm neu zeichnen
+                    lineChartLuftfeuchtigkeit.update();
+                },
+                error: function (xhr, status, error) {
+                    console.log("Fehler beim Abrufen der Luftfeuchtigkeitdaten:", error);
+                }
+            });
+
+            lineChartLuftfeuchtigkeit.update();
         });
 
         function buildDiagramms() {
 
             ammoniakDiagramm();
+            luftfeuchtigkeitDiagramm()
         }
 
         function ammoniakDiagramm() {
@@ -123,7 +181,7 @@
                 ]
             };
 
-            var options1 = {
+            var optionsAmmoniak = {
                 responsive: true,
                 scales: {
                     y: {
@@ -139,7 +197,61 @@
             lineChartAmmoniak = new Chart($("#lineChartAmmoniak"), {
                 type: "line",
                 data: dataAmmoniak,
-                options: options1
+                options: optionsAmmoniak
+            });
+    }
+
+    function luftfeuchtigkeitDiagramm() {
+
+        var luftfeuchtigkeitWerteTagDurchschnitt = @Html.Raw(ViewBag.luftfeuchtigkeitWerteTagDurchschnitt);
+        var luftfeuchtigkeitWerteTagAktuell = @Html.Raw(ViewBag.luftfeuchtigkeitWerteTagAktuell);
+
+            var grenzeTag = ["10", "10", "10", "10", "10", "10", "10", "10", "10", "10", "10", "10"];
+
+        dataLuftfeuchtigkeit = {
+                labels: labelTag,
+                datasets: [
+                    {
+                        label: "Luftfeuchtigkeit-Durchschnitt",
+                        data: luftfeuchtigkeitWerteTagDurchschnitt,
+                        fill: true,
+                        borderColor: "rgb(219, 211, 123)",
+                        tension: 0.2
+                    },
+                    {
+                        label: "Luftfeuchtigkeit aktuell",
+                        data: luftfeuchtigkeitWerteTagAktuell,
+                        fill: false,
+                        borderColor: "rgb(13, 13, 13)",
+                        tension: 0.2
+                    },
+                    {
+                        label: "Luftfeuchtigkeitgrenze",
+                        data: grenzeTag,
+                        fill: true,
+                        borderColor: "rgb(240, 2, 2)",
+                        tension: 0.1
+                    }
+                ]
+            };
+
+        var optionsLuftfeuchtigkeit = {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Luftfeuchtigkeit in Prozent'
+                        }
+                    }
+                }
+            };
+
+        lineChartLuftfeuchtigkeit = new Chart($("#lineChartLuftfeuchtigkeit"), {
+                type: "line",
+            data: dataLuftfeuchtigkeit,
+            options: optionsLuftfeuchtigkeit
             });
         }
 
@@ -149,7 +261,14 @@
                 type: "GET",
                 success: function (ammoniakData) {
 
-                    lineChartAmmoniak.data.datasets[0].data = ammoniakData;
+                    var button = document.getElementById("tagBtnAmmoniak");
+                    if (button.classList.contains("active")) {
+                        lineChartLuftfeuchtigkeit.data.datasets[0].data = JSON.parse(ammoniakData["ammoniakWerteTagDurchschnitt"]); //Durchschnitt
+                        lineChartLuftfeuchtigkeit.data.datasets[1].data = JSON.parse(ammoniakData["ammoniakWerteTagAktuell"]); //Aktuell
+                    } else {
+                        lineChartLuftfeuchtigkeit.data.datasets[0].data = JSON.parse(ammoniakData["ammoniakWerteWocheDurchschnitt"]); //Durchschnitt
+                        lineChartLuftfeuchtigkeit.data.datasets[1].data = JSON.parse(ammoniakData["ammoniakWerteWocheAktuell"]); //Aktuell
+                    }
 
                     // Diagramm neu zeichnen
                     lineChartAmmoniak.update();
@@ -158,5 +277,26 @@
                     console.log("Fehler beim Abrufen der Ammoniakdaten:", error);
                 }
             });
-        }
+
+            $.ajax({
+                url: "/Home/GetLuftfeuchtigkeit", // Die URL des Controller-Endpunkts, um die aktualisierten Daten abzurufen
+                type: "GET",
+                success: function (luftfeuchtigkeitData) {
+                    var button = document.getElementById("tagBtnLuftfeuchtigkeit");
+                    if (button.classList.contains("active")) {
+                        lineChartLuftfeuchtigkeit.data.datasets[0].data = JSON.parse(luftfeuchtigkeitData["luftfeuchtigkeitWerteTagDurchschnitt"]); //Durchschnitt
+                        lineChartLuftfeuchtigkeit.data.datasets[1].data = JSON.parse(luftfeuchtigkeitData["luftfeuchtigkeitWerteTagAktuell"]); //Aktuell
+                    } else {
+                        lineChartLuftfeuchtigkeit.data.datasets[0].data = JSON.parse(luftfeuchtigkeitData["luftfeuchtigkeitWerteWocheDurchschnitt"]); //Durchschnitt
+                        lineChartLuftfeuchtigkeit.data.datasets[1].data = JSON.parse(luftfeuchtigkeitData["luftfeuchtigkeitWerteWocheAktuell"]); //Aktuell
+                    }
+
+                    // Diagramm neu zeichnen
+                    lineChartLuftfeuchtigkeit.update();
+                },
+                error: function (xhr, status, error) {
+                    console.log("Fehler beim Abrufen der Luftfeuchtigkeitdaten:", error);
+                }
+            });
+    }
 </script>
