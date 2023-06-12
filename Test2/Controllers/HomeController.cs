@@ -13,6 +13,7 @@ namespace Test2.Controllers
     {
         Ammoniak amonniak = new Ammoniak();
         Luftfeuchtigkeit luftfeuchtigkeit = new Luftfeuchtigkeit();
+        Temperatur temperatur = new Temperatur();
 
         public ActionResult Index()
         {
@@ -21,6 +22,8 @@ namespace Test2.Controllers
 
             ViewBag.luftfeuchtigkeitWerteTagAktuell = luftfeuchtigkeit.LuftfeuchtigkeitAktuellListeTag;
             ViewBag.luftfeuchtigkeitWerteTagDurchschnitt = luftfeuchtigkeit.LuftfeuchtigkeitDurschnittListeTag;
+
+            ViewBag.temperaturWerteTagAktuell = temperatur.TemperaturAktuellListeTag;
 
             return View();
         }
@@ -45,6 +48,15 @@ namespace Test2.Controllers
             luftfeuchtigkeitWerte.Add("luftfeuchtigkeitWerteWocheAktuell", luftfeuchtigkeit.LuftfeuchtigkeitAktuellWoche);
             luftfeuchtigkeitWerte.Add("luftfeuchtigkeitWerteWocheDurchschnitt", luftfeuchtigkeit.LuftfeuchtigkeitDurchschnittWoche);
             return Json(luftfeuchtigkeitWerte, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult GetTemperatur()
+        {
+            Dictionary<string, string> temperaturWerte = new Dictionary<string, string>();
+            temperaturWerte.Add("temperaturWerteTagAktuell", temperatur.TemperaturAktuellListeTag);
+            temperaturWerte.Add("temperaturWerteWocheAktuell", temperatur.TemperaturAktuellWoche);
+
+            return Json(temperaturWerte, JsonRequestBehavior.AllowGet);
         }
     }
 }

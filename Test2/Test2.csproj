@@ -126,6 +126,7 @@
     </Compile>
     <Compile Include="Models\Ammoniak.cs" />
     <Compile Include="Models\Luftfeuchtigkeit.cs" />
+    <Compile Include="Models\Temperatur.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

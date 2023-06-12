@@ -26,6 +26,8 @@
 <!----------------------------------------Luftfeuchtigkeit----------------------------------------------->
 <br />
 <br />
+<br />
+<br />
 <div>
     <h2>Luftfeuchtigkeit</h2>
     <div class="btn-group" role="group" aria-label="Chart View">
@@ -33,6 +35,20 @@
         <button id="tagBtnLuftfeuchtigkeit" type="button" class="btn btn-secondary active">Tag</button>
     </div>
     <canvas id="lineChartLuftfeuchtigkeit"></canvas>
+</div>
+
+<!----------------------------------------Luftfeuchtigkeit----------------------------------------------->
+<br />
+<br />
+<br />
+<br />
+<div>
+    <h2>Temperatur</h2>
+    <div class="btn-group" role="group" aria-label="Chart View">
+        <button id="wocheBtnTemperatur" type="button" class="btn btn-secondary">Woche</button>
+        <button id="tagBtnTemperatur" type="button" class="btn btn-secondary active">Tag</button>
+    </div>
+    <canvas id="lineChartTemperatur"></canvas>
 </div>
 
 <!---------------------------------------------------------------------------------------------->
@@ -46,7 +62,9 @@
         var lineChartAmmoniak;
         var dataAmmoniak;
         var lineChartLuftfeuchtigkeit;
-        var dataLuftfeuchtigkeit;
+    var dataLuftfeuchtigkeit;
+    var lineChartTemperatur;
+    var dataTemperatur;
         var labelWoche = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"];
         var labelTag = ["00-01 Uhr", "02-03 Uhr", "04-05 Uhr", "06-07 Uhr", "08-09 Uhr", "10-11 Uhr", "12-13 Uhr", "14-15 Uhr", "16-17 Uhr", "18-19 Uhr", "20-21 Uhr", "22-23 Uhr"];
 
@@ -97,6 +115,28 @@
             lineChartLuftfeuchtigkeit.update();
         });
 
+    document.getElementById("tagBtnTemperatur").addEventListener("click", function () {
+        var dataLabels = labelTag;
+        dataTemperatur.labels = dataLabels;
+
+        $.ajax({
+            url: "/Home/GetTemperatur", // Die URL des Controller-Endpunkts, um die aktualisierten Daten abzurufen
+            type: "GET",
+            success: function (temperaturData) {
+
+                lineChartTemperatur.data.datasets[0].data = JSON.parse(temperaturData["temperaturWerteTagAktuell"]);
+
+                // Diagramm neu zeichnen
+                lineChartTemperatur.update();
+            },
+            error: function (xhr, status, error) {
+                console.log("Fehler beim Abrufen der Temperaturdaten:", error);
+            }
+        });
+
+        lineChartTemperatur.update();
+    });
+
         document.getElementById("wocheBtnAmmoniak").addEventListener("click", function () {
             var dataLabels = labelWoche;
             dataAmmoniak.labels = dataLabels;
@@ -141,10 +181,33 @@
             lineChartLuftfeuchtigkeit.update();
         });
 
+    document.getElementById("wocheBtnTemperatur").addEventListener("click", function () {
+        var dataLabels = labelWoche;
+        dataTemperatur.labels = dataLabels;
+
+        $.ajax({
+            url: "/Home/GetTemperatur", // Die URL des Controller-Endpunkts, um die aktualisierten Daten abzurufen
+            type: "GET",
+            success: function (temperaturData) {
+
+                lineChartTemperatur.data.datasets[0].data = JSON.parse(temperaturData["temperaturWerteWocheAktuell"]); //Durchschnitt
+
+                // Diagramm neu zeichnen
+                lineChartTemperatur.update();
+            },
+            error: function (xhr, status, error) {
+                console.log("Fehler beim Abrufen der Temperaturdaten:", error);
+            }
+        });
+
+        lineChartTemperatur.update();
+    });
+
         function buildDiagramms() {
 
             ammoniakDiagramm();
             luftfeuchtigkeitDiagramm()
+            temperaturDiagramm()
         }
 
         function ammoniakDiagramm() {
@@ -253,6 +316,52 @@
             data: dataLuftfeuchtigkeit,
             options: optionsLuftfeuchtigkeit
             });
+    }
+
+     function temperaturDiagramm() {
+
+         var temperaturWerteTagAktuell = @Html.Raw(ViewBag.temperaturWerteTagAktuell);
+
+         var grenzeTag = ["25", "25", "25", "25", "25", "25", "25", "25", "25", "25", "25", "25"];
+
+        dataTemperatur = {
+                labels: labelTag,
+                datasets: [
+                    {
+                        label: "Temperatur aktuell",
+                        data: temperaturWerteTagAktuell,
+                        fill: false,
+                        borderColor: "rgb(13, 13, 13)",
+                        tension: 0.2
+                    },
+                    {
+                        label: "Temperaturgrenze",
+                        data: grenzeTag,
+                        fill: true,
+                        borderColor: "rgb(240, 2, 2)",
+                        tension: 0.1
+                    }
+                ]
+            };
+
+        var optionsTemperatur = {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Temperatur in Grad Celsuis'
+                        }
+                    }
+                }
+            };
+
+         lineChartTemperatur = new Chart($("#lineChartTemperatur"), {
+                type: "line",
+             data: dataTemperatur,
+             options: optionsTemperatur
+            });
         }
 
         function aktualisiereView() {
@@ -296,6 +405,26 @@
                 },
                 error: function (xhr, status, error) {
                     console.log("Fehler beim Abrufen der Luftfeuchtigkeitdaten:", error);
+                }
+            });
+
+            $.ajax({
+                url: "/Home/GetTemperatur", // Die URL des Controller-Endpunkts, um die aktualisierten Daten abzurufen
+                type: "GET",
+                success: function (temperaturData) {
+
+                    var button = document.getElementById("tagBtnTemperatur");
+                    if (button.classList.contains("active")) {
+                        lineChartTemperatur.data.datasets[0].data = JSON.parse(temperaturData["temperaturWerteTagAktuell"]); //Durchschnitt
+                    } else {
+                        lineChartTemperatur.data.datasets[0].data = JSON.parse(temperaturData["temperaturWerteWocheAktuell"]); //Durchschnitt
+                    }
+
+                    // Diagramm neu zeichnen
+                    lineChartTemperatur.update();
+                },
+                error: function (xhr, status, error) {
+                    console.log("Fehler beim Abrufen der Temperaturdaten:", error);
                 }
             });
     }
