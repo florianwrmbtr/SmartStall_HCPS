@@ -11,6 +11,12 @@ namespace Test2
     {
         public static void RegisterRoutes(RouteCollection routes)
         {
+            routes.MapRoute(
+                name: "ReceiveData",
+                url: "ReceiveData/{id}",
+                defaults: new { controller = "ReceiveData", action = "ReceiveData", id = UrlParameter.Optional }
+            );
+
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
             routes.MapRoute(
@@ -18,6 +24,7 @@ namespace Test2
                 url: "{controller}/{action}/{id}",
                 defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
             );
+          
         }
     }
 }
