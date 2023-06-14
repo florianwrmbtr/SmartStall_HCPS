@@ -13,7 +13,6 @@
             AmmoniakDurschnittListeTag = "[10, 8, 10, 9, 8, 10, 10, 8, 10, 9, 15, 16]";
             AmmoniakAktuellWoche = "[10, 8, 10, 9, 15, 16, 10]";
             AmmoniakDurchschnittWoche = "[10, 8, 10, 9, 15, 16, 9]";
-
         }
     }
 }
