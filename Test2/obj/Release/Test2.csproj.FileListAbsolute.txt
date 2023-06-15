@@ -1,4 +1,3 @@
-D:\dev\SmartStall_HCPS\Test2\bin\Test2.dll.config
 D:\dev\SmartStall_HCPS\Test2\bin\Test2.dll
 D:\dev\SmartStall_HCPS\Test2\bin\Test2.pdb
 D:\dev\SmartStall_HCPS\Test2\bin\roslyn\csc.exe
@@ -168,3 +167,4 @@ D:\dev\SmartStall_HCPS\Test2\obj\Release\Test2.csproj.CoreCompileInputs.cache
 D:\dev\SmartStall_HCPS\Test2\obj\Release\Test2.csproj.CopyComplete
 D:\dev\SmartStall_HCPS\Test2\obj\Release\Test2.dll
 D:\dev\SmartStall_HCPS\Test2\obj\Release\Test2.pdb
+D:\dev\SmartStall_HCPS\Test2\bin\Test2.dll.config
